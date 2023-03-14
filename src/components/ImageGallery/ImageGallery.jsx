@@ -13,9 +13,10 @@ export default class ImageGallery extends Component {
               <ImageGalleryItem
                 key={item.id}
                 src={item.webformatURL}
-                onClickImage={this.props.onClickImage}
-                toggleModal={this.props.toggleModal}
-                modalImg={item.largeImageURL}
+                onClickImage={() => {
+                  this.props.toggleModal();
+                  this.props.onClickImage(item.largeImageURL);
+                }}
               />
             ))}
         </ul>
