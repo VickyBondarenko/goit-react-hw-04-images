@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import css from './appStyle.module.css';
 import { Searchbar } from './Searchbar/Searchbar';
 import { getImages } from 'api/imageAPI';
@@ -7,88 +7,81 @@ import { Button } from './Button/Button';
 import { Hearts } from 'react-loader-spinner';
 import { Modal } from './Modal/Modal';
 
-export class App extends Component {
-  state = {
-    photos: [],
-    isLoading: false,
-    query: '',
-    page: 1,
-    isOpen: false,
-    modalImg: '',
-  };
+export const App = () => {
+  const [photos, setPhotos] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [isOpen, setIsOpen] = useState(false);
+  const [modalImg, setModalImg] = useState('');
+  const queryRef = useRef('');
 
-  async componentDidUpdate(_, prevState) {
-    if (
-      this.state.query !== prevState.query ||
-      this.state.page !== prevState.page
-    ) {
-      const photos = await getImages(this.state.query, this.state.page);
-      this.setState(prev => ({
-        photos: [...prev.photos, ...photos.data.hits],
-        isLoading: false,
-      }));
+  useEffect(() => {
+    const getPhotos = async (page, data) => {
+      const images = await getImages(query, page);
+
+      setPhotos([...data, ...images.data.hits]);
+      setIsLoading(false);
+      setPage(page + 1);
+    };
+    if (isLoading) {
+      if (query !== queryRef.current) {
+        queryRef.current = query;
+
+        setPage(1);
+        getPhotos(page, []);
+      } else {
+        getPhotos(page, photos);
+      }
     }
-  }
+  }, [isLoading]);
 
-  handleSubmit = str => {
-    this.setState({
-      photos: [],
-      isLoading: true,
-      query: str,
-      page: 1,
-    });
+  const handleSubmit = str => {
+    setIsLoading(true);
+    setQuery(str);
   };
 
-  loadMore = () => {
-    this.setState(prevState => ({ page: prevState.page + 1, isLoading: true }));
+  const loadMore = () => {
+    setIsLoading(true);
   };
 
-  toggleModal = () => {
-    this.setState(prevState => ({ isOpen: !prevState.isOpen }));
+  const toggleModal = () => {
+    setIsOpen(prevState => !prevState);
   };
 
-  setImg = modalImg => {
-    this.setState({ modalImg });
+  const setImg = modalImg => {
+    setModalImg(modalImg);
   };
 
-  render() {
-    return (
-      <div className={css.App}>
-        {this.state.isLoading ? (
-          <div>
-            <Searchbar onSubmit={this.handleSubmit} />
-            <div className={css.Loading}>
-              <Hearts
-                height="120"
-                width="120"
-                color="#e84b4b"
-                ariaLabel="hearts-loading"
-                wrapperStyle={{}}
-                wrapperClass=""
-                visible={true}
-              />
-            </div>
-          </div>
-        ) : (
-          <div>
-            <Searchbar onSubmit={this.handleSubmit} />
-            <ImageGallery
-              images={this.state.photos}
-              onClickImage={this.setImg}
-              toggleModal={this.toggleModal}
+  return (
+    <div className={css.App}>
+      {isLoading ? (
+        <div>
+          <Searchbar onSubmit={handleSubmit} />
+          <div className={css.Loading}>
+            <Hearts
+              height="120"
+              width="120"
+              color="#e84b4b"
+              ariaLabel="hearts-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+              visible={true}
             />
-            {this.state.photos.length !== 0 && (
-              <Button onHandleClick={this.loadMore} />
-            )}
-            {this.state.isOpen && (
-              <Modal
-                onModalClose={this.toggleModal}
-                modalImg={this.state.modalImg}
-              />
-            )}
           </div>
-        )}
-      </div>
-    );
-  }
-}
+        </div>
+      ) : (
+        <div>
+          <Searchbar onSubmit={handleSubmit} />
+          <ImageGallery
+            images={photos}
+            onClickImage={setImg}
+            toggleModal={toggleModal}
+          />
+          {photos.length !== 0 && <Button onHandleClick={loadMore} />}
+          {isOpen && <Modal onModalClose={toggleModal} modalImage={modalImg} />}
+        </div>
+      )}
+    </div>
+  );
+};
