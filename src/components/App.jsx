@@ -27,13 +27,13 @@ export const App = () => {
     if (isLoading) {
       if (query !== queryRef.current) {
         queryRef.current = query;
-
         setPage(1);
         getPhotos(page, []);
       } else {
         getPhotos(page, photos);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
 
   const handleSubmit = str => {

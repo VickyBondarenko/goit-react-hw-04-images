@@ -19,6 +19,7 @@ export const Modal = ({ onModalClose, modalImage }) => {
     return () => {
       document.removeEventListener('keydown', handlePressKey);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
