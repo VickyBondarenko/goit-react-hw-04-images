@@ -25,6 +25,6 @@ export const ImageGallery = ({ images, onClickImage, toggleModal }) => {
 
 ImageGallery.propTypes = {
   images: PropTypes.arrayOf(PropTypes.object).isRequired,
-  onClickImage: PropTypes.func.isRequired,
+  onClickImage: PropTypes.func,
   toggleModal: PropTypes.func.isRequired,
 };
