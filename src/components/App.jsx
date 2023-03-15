@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import css from './appStyle.module.css';
 import { Searchbar } from './Searchbar/Searchbar';
 import { getImages } from 'api/imageAPI';
-import ImageGallery from './ImageGallery/ImageGallery';
+import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Button } from './Button/Button';
 import { Hearts } from 'react-loader-spinner';
 import { Modal } from './Modal/Modal';
